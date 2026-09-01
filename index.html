@@ -144,21 +144,22 @@
             }
 
             #game-scene {
-                height: 220px;
+                height: 200px;
             }
 
             #character-layer {
-                height: 120px;
+                height: 92px;
             }
 
             .person {
-                width: 50px;
-                height: 68px;
-                transform: scale(0.75);
+                width: 42px;
+                height: 56px;
+                bottom: 5px;
+                transform: scale(0.66);
             }
 
             .man.visible {
-                transform: scale(0.75);
+                transform: scale(0.66);
             }
 
             #stop-indicator {
@@ -299,12 +300,12 @@
         .person::after {
             content: "";
             position: absolute;
-            left: 12%;
-            bottom: -10px;
-            width: 72%;
-            height: 12px;
+            left: 14%;
+            bottom: -8px;
+            width: 64%;
+            height: 10px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.32);
+            background: rgba(0, 0, 0, 0.28);
             filter: blur(2px);
         }
 
@@ -547,6 +548,21 @@
             animation: heartAppear 1.2s ease-out forwards;
         }
 
+        #kiss-heart span {
+            position: relative;
+            z-index: 1;
+            display: block;
+            width: 72%;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.7;
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
         @keyframes heartAppear {
             0% {
                 opacity: 0;
@@ -619,7 +635,7 @@
     </div>
 
     <div id="kiss-scene">
-        <div id="kiss-heart"><span>FELIZ CUMPLE MES<br>MI AMOR ❤️</span></div>
+        <div id="kiss-heart"><span>FELIZ CUMPLE MES VIVIENDO JUNTOSPORCION DEL PERSONAJE<br>MI AMOR ❤️</span></div>
     </div>
 
     <div id="final-screen">
@@ -659,7 +675,7 @@
             {
                 location: "📍 LA CIUDAD QUE NOS UNIO",
                 bg: "maracay_obelisco.png",
-                text: "Gracias por ser como eres conmigo, disculpa por ser como soy y no ser lo que esperas. pero mis virtudes son otras y so todas tuyas",
+                text: "Gracias por ser como eres conmigo, disculpa por ser como soy y no ser lo que esperas. pero mis virtudes son otras y son todas tuyas",
                 button: "SEGUIR JUNTOS 🤝"
             },
             {
