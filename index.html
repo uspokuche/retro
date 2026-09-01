@@ -84,9 +84,10 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 24%, rgba(12, 10, 18, 0.06));
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 45%);
             z-index: 2;
             pointer-events: none;
+            opacity: 0.9;
         }
 
         #game-scene::after {
@@ -95,13 +96,13 @@
             inset: 0;
             background: repeating-linear-gradient(
                 180deg,
-                rgba(255,255,255,0.04),
-                rgba(255,255,255,0.04) 1px,
+                rgba(255,255,255,0.02),
+                rgba(255,255,255,0.02) 1px,
                 transparent 1px,
                 transparent 4px
             );
             mix-blend-mode: screen;
-            opacity: 0.35;
+            opacity: 0.12;
             pointer-events: none;
             z-index: 3;
         }
@@ -872,7 +873,7 @@
 
             // Cambiar fondo según la etapa del recorrido
             if (step.bg) {
-                bgElement.style.backgroundImage = `linear-gradient(180deg, rgba(10,12,28,0.75), rgba(5,8,15,0.9)), url('${step.bg}')`;
+                bgElement.style.backgroundImage = `url('${step.bg}')`;
             }
 
             playRetroBeep(220, 0.1);
@@ -904,7 +905,7 @@
             manChar.classList.remove('walking', 'visible');
             manChar.style.opacity = '0';
             manChar.style.left = '68%';
-            bgElement.style.backgroundImage = "linear-gradient(180deg, rgba(10,12,28,0.75), rgba(5,8,15,0.9)), url('maracay_sindoni.png')";
+            bgElement.style.backgroundImage = "url('maracay_sindoni.png')";
             locationTag.innerText = "📍 MARACAY - AV. LAS DELICIAS";
             dialogText.innerText = "Presiona 'INICIAR' para comenzar nuestro recorrido retro por Maracay...";
             actionBtn.innerText = "INICIAR";
