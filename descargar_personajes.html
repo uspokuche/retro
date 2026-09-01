@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estación de Renderizado 16-Bits - Elite</title>
+    <style>
+        body {
+            background-color: #0b0d17;
+            color: #ffffff;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+        }
+        h1 {
+            color: #00e676;
+            text-shadow: 2px 2px #000;
+            text-transform: uppercase;
+        }
+        p { color: #a0aec0; margin-bottom: 30px; }
+        .container {
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            background: #1a1c2e;
+            border: 4px solid #ff4081;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(255, 64, 129, 0.2);
+        }
+        canvas {
+            image-rendering: pixelated; /* Mantiene el pixel art nítido */
+            border: 2px solid #333;
+            background: transparent;
+            margin-bottom: 15px;
+            width: 200px; /* Escalado para visualización */
+            height: 240px;
+        }
+        button {
+            background: #ff4081;
+            color: white;
+            border: 2px solid #fff;
+            padding: 10px 20px;
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: transform 0.1s;
+        }
+        button:hover {
+            background: #f50057;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generador Elite de Sprites</h1>
+    <p>Tus personajes adaptados al estilo de los escenarios de Maracay.</p>
+
+    <div class="container">
+        <div class="card">
+            <h3 style="color:#f48fb1;">La Novia</h3>
+            <canvas id="canvasElla" width="200" height="240"></canvas><br>
+            <button onclick="descargarPNG('canvasElla', 'personaje_ella.png')">⬇️ DESCARGAR ELLA</button>
+        </div>
+
+        <div class="card">
+            <h3 style="color:#80cbd3;">El Novio</h3>
+            <canvas id="canvasEl" width="200" height="240"></canvas><br>
+            <button onclick="descargarPNG('canvasEl', 'personaje_el.png')">⬇️ DESCARGAR ÉL</button>
+        </div>
+    </div>
+
+    <script>
+        // FACTOR DE ESCALA (Cada pixel original medirá 10x10 pixeles en el PNG final para que no pierda calidad)
+        const scale = 10;
+
+        // PALETAS DE COLORES 16-BITS
+        const paletaElla = {
+            '1': '#111111', // Borde
+            '2': '#d49a7a', // Piel
+            '3': '#b07050', // Sombra piel
+            '4': '#2a1f1a', // Cabello oscuro
+            '5': '#4a3b32', // Brillo cabello
+            '6': '#222222', // Top negro
+            '7': '#ffffff', // Ojo (blanco)
+            '8': '#4a2c11'  // Ojo (color)
+        };
+
+        const paletaEl = {
+            '1': '#111111', // Borde / Lentes marco
+            '2': '#e0a98b', // Piel (tono ajustado a su foto)
+            '3': '#c28868', // Sombra piel
+            '4': '#333333', // Cabello corto / Barba
+            '5': '#1a1a1a', // Franela oscura
+            '6': '#eeeeee', // Detalle franela clara
+            '7': '#00e5ff', // Lentes Cyan
+            '8': '#d500f9', // Lentes Magenta
+            '9': '#2979ff'  // Lentes Azul
+        };
+
+        // MATRIZ DE DIBUJO - ELLA (Cabello largo, top negro)
+        const spriteElla = [
+            "......11111111......",
+            "....114444444411....",
+            "...14444444444541...",
+            "..1444444444445541..",
+            ".144441111111144441.",
+            ".144412222222214441.",
+            "14441222222222214441",
+            "14441211222211214441",
+            "14412278222287221441",
+            "14412222333322221441",
+            "14412221111112221441",
+            "14412222222222221441",
+            "14441122222222114441",
+            ".144441111111144441.",
+            ".114412222222214411.",
+            "...11666666666611...",
+            "..1216666116666121..",
+            ".122166612216661221.",
+            ".122166612216661221.",
+            ".122166612216661221.",
+            "..1116666116666111..",
+            "....166666666661....",
+            "....166666666661....",
+            ".....1111111111....."
+        ];
+
+        // MATRIZ DE DIBUJO - ÉL (Fade, Goatee, Lentes de colores)
+        const spriteEl = [
+            "......11111111......",
+            "....114444444411....",
+            "...14444444444441...",
+            "..1444222222224441..",
+            "..1442222222222441..",
+            "..1422222222222241..",
+            "...11111111111111...",
+            "..1177991111889911..",
+            "..1179991111899911..",
+            "...11111111111111...",
+            "...12222333322221...",
+            "...12221111112221...",
+            "...12221444412221...",
+            "....112222222211....",
+            "......11111111......",
+            ".....1555555551.....",
+            "...11555555555511...",
+            "..1215555555555121..",
+            ".122155566665551221.",
+            ".122155566665551221.",
+            ".122155555555551221.",
+            "..1115555555555111..",
+            "....155555555551....",
+            ".....1111111111....."
+        ];
+
+        // Función para renderizar el pixel art en el canvas
+        function dibujarSprite(canvasId, spriteData, paleta) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            for (let y = 0; y < spriteData.length; y++) {
+                const fila = spriteData[y];
+                for (let x = 0; x < fila.length; x++) {
+                    const pixel = fila[x];
+                    if (pixel !== '.') {
+                        ctx.fillStyle = paleta[pixel];
+                        ctx.fillRect(x * scale, y * scale, scale, scale);
+                    }
+                }
+            }
+        }
+
+        // Función para descargar la imagen
+        function descargarPNG(canvasId, nombreArchivo) {
+            const canvas = document.getElementById(canvasId);
+            const url = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Ejecutar dibujado al cargar la página
+        window.onload = () => {
+            dibujarSprite('canvasElla', spriteElla, paletaElla);
+            dibujarSprite('canvasEl', spriteEl, paletaEl);
+        };
+    </script>
+</body>
+</html>

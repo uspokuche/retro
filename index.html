@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestra Historia en Maracay - ¡Feliz Cumple Mes!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top, rgba(168, 85, 247, 0.22), transparent 38%),
+                radial-gradient(circle at bottom, rgba(255, 88, 151, 0.13), transparent 30%),
+                linear-gradient(180deg, #060811 0%, #0b1020 100%);
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 12px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Marco del Juego */
+        #game-frame {
+            width: min(860px, 100%);
+            min-height: 360px;
+            position: relative;
+            border: 6px solid rgba(136, 92, 255, 0.95);
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 0 28px rgba(138, 43, 226, 0.6), 0 0 40px rgba(255, 82, 168, 0.22), inset 0 0 18px rgba(0,0,0,0.9);
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(11, 13, 28, 0.96), rgba(5, 5, 10, 1));
+            overflow: hidden;
+            display: block;
+            padding: 0;
+        }
+
+        #game-frame::before {
+            content: "";
+            position: absolute;
+            inset: 10px;
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        #game-frame::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.12) 25%, transparent 52%);
+            transform: translateX(-100%);
+            animation: shineSweep 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 7;
+        }
+
+        @keyframes shineSweep {
+            0% { transform: translateX(-120%); }
+            35%, 100% { transform: translateX(120%); }
+        }
+
+        #game-scene {
+            position: relative;
+            width: 100%;
+            height: 360px;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            background: #05050a;
+            flex-shrink: 0;
+            border-bottom: 0;
+        }
+
+        #game-scene::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 30%, rgba(0,0,0,0.2));
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        #game-scene::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                180deg,
+                rgba(255,255,255,0.04),
+                rgba(255,255,255,0.04) 1px,
+                transparent 1px,
+                transparent 4px
+            );
+            mix-blend-mode: screen;
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .scene-glow {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 15%, rgba(255, 96, 164, 0.2), transparent 18%),
+                radial-gradient(circle at 75% 10%, rgba(88, 129, 255, 0.18), transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(255, 214, 94, 0.18), transparent 28%),
+                linear-gradient(180deg, rgba(255,255,255,0.06), transparent 30%, rgba(255,94,166,0.06));
+            filter: blur(8px);
+            z-index: 1;
+            animation: glowPulse 5s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes glowPulse {
+            from { opacity: 0.75; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.04); }
+        }
+
+        #dialog-box,
+        #game-frame,
+        #sound-toggle,
+        .restart-btn,
+        #action-btn {
+            backdrop-filter: blur(2px);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px 8px;
+            }
+
+            #game-frame {
+                border-width: 4px;
+            }
+
+            #game-scene {
+                height: 220px;
+            }
+
+            #character-layer {
+                height: 120px;
+            }
+
+            .person {
+                width: 72px;
+                height: 96px;
+            }
+
+            #stop-indicator {
+                top: 10px;
+                right: 10px;
+                padding: 7px 8px;
+                font-size: 7px;
+            }
+
+            #dialog-box {
+                padding: 14px 12px;
+                min-height: 120px;
+            }
+
+            #location-tag {
+                font-size: 7px;
+            }
+
+            #dialog-text {
+                font-size: 9px;
+                line-height: 1.6;
+            }
+
+            #action-btn {
+                width: 100%;
+                align-self: stretch;
+                font-size: 8px;
+                padding: 10px 12px;
+            }
+
+            #final-screen {
+                padding: 20px 18px;
+            }
+
+            #final-screen h1 {
+                font-size: 18px;
+            }
+
+            #final-screen p {
+                font-size: 9px;
+                line-height: 1.7;
+            }
+
+            #sound-toggle {
+                top: 8px;
+                left: 8px;
+                padding: 5px 7px;
+                font-size: 7px;
+            }
+
+            #kiss-heart {
+                width: min(220px, 62vw);
+                height: min(180px, 46vw);
+            }
+
+            #kiss-heart span {
+                font-size: 10px;
+                line-height: 1.5;
+            }
+        }
+
+        /* Capas de Fondo */
+        #game-bg {
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(180deg, rgba(10,12,28,0.75), rgba(5,8,15,0.9)), url('maracay_sindoni.png');
+            background-size: 100% 100%;
+            background-position: center center;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        #game-scene::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: transparent;
+        }
+
+        .bg-moving {
+            animation: moveBackground 8s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0px center; }
+            to { background-position: -800px center; }
+        }
+
+        /* Personajes basados en las imágenes del modelo */
+        #character-layer {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 180px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .person {
+            position: absolute;
+            bottom: 0;
+            left: 120px;
+            width: 96px;
+            height: 128px;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            background-size: 100% 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            transition: left 1.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, transform 0.2s ease;
+            filter: drop-shadow(3px 4px 0 rgba(0,0,0,0.55));
+            transform-origin: bottom center;
+        }
+
+        .person::after {
+            content: "";
+            position: absolute;
+            left: 12%;
+            bottom: -10px;
+            width: 72%;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.32);
+            filter: blur(2px);
+        }
+
+        .person.walking {
+            animation: walkCycle 0.7s ease-in-out infinite alternate;
+        }
+
+        @keyframes walkCycle {
+            0% { transform: translateY(0px) scaleY(1); }
+            50% { transform: translateY(-7px) scaleY(1.02); }
+            100% { transform: translateY(0px) scaleY(1); }
+        }
+
+        .woman {
+            opacity: 1;
+            background-image: url('personajes/personaje_ella.png');
+            background-size: 100% 100%;
+        }
+
+        .man {
+            opacity: 0;
+            transform: scale(0.95);
+            background-image: url('personajes/personaje_el.png');
+            background-size: 100% 100%;
+        }
+
+        .man.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Indicador Corazón de Parada */
+        #stop-indicator {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: linear-gradient(135deg, #ff5fb2, #ff2e71);
+            color: #fff;
+            padding: 10px 16px;
+            font-size: 10px;
+            border-radius: 999px;
+            border: 3px solid rgba(255,255,255,0.9);
+            box-shadow: 0 0 0 4px rgba(255, 94, 166, 0.2), 0 8px 18px rgba(0,0,0,0.45);
+            animation: heartPulse 0.8s infinite alternate;
+            display: none;
+            z-index: 8;
+            letter-spacing: 1px;
+        }
+
+        @keyframes heartPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+
+        /* Cuadro de Diálogo fuera del paisaje */
+        #story-panel {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        #dialog-box {
+            position: relative;
+            width: 100%;
+            min-height: 140px;
+            background: linear-gradient(180deg, rgba(16, 19, 32, 0.98), rgba(10, 12, 22, 0.96));
+            border: 4px solid #ffd600;
+            border-radius: 14px;
+            padding: 18px 22px;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.06), 0 18px 35px rgba(0,0,0,0.42), inset 0 0 10px rgba(255, 255, 255, 0.06);
+            z-index: 12;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        #location-tag {
+            font-size: 9px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px #000;
+        }
+
+        #dialog-text {
+            font-size: 11px;
+            line-height: 1.7;
+            color: #f8f9fa;
+            min-height: 48px;
+            text-shadow: 1px 1px #000;
+            word-break: break-word;
+        }
+
+        /* Botón de Acción */
+        #action-btn {
+            align-self: flex-end;
+            margin-top: 10px;
+            background: linear-gradient(180deg, #48d56d, #2ca14f);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 5px 0 #1c7f3a, 0 10px 20px rgba(28,127,58,0.35);
+            transition: all 0.15s ease;
+            letter-spacing: 0.5px;
+        }
+
+        #action-btn:hover:not(:disabled) {
+            background: linear-gradient(180deg, #63e68a, #38b663);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #1c7f3a, 0 12px 20px rgba(28,127,58,0.35);
+        }
+
+        #action-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #1c7f3a;
+        }
+
+        #action-btn:disabled {
+            background: #555;
+            border-color: #888;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Pantalla Final */
+        #final-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(20, 10, 35, 0.95) 0%, rgba(5, 5, 10, 0.98) 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            z-index: 20;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #final-screen h1 {
+            color: #ff79b5;
+            font-size: 22px;
+            margin-bottom: 25px;
+            text-shadow: 3px 3px 0px #000, 0 0 18px rgba(255, 118, 182, 0.8);
+            line-height: 1.4;
+        }
+
+        #final-screen p {
+            font-size: 11px;
+            line-height: 1.9;
+            color: #f3f3f3;
+            max-width: 620px;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px #000;
+        }
+
+        .restart-btn {
+            background: linear-gradient(180deg, #ff5ca8, #e91e63);
+            color: white;
+            border: 2px solid #fff;
+            padding: 12px 24px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 5px 0 #b5154a, 0 10px 20px rgba(233, 30, 99, 0.35);
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(180deg, #ff78ba, #f50057);
+        }
+
+        /* Música / Efectos */
+        #sound-toggle {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 15;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 6px 10px;
+            font-size: 8px;
+            cursor: pointer;
+            border-radius: 999px;
+            font-family: 'Press Start 2P', monospace;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+        }
+
+        #kiss-scene {
+            position: absolute;
+            inset: 0;
+            display: none;
+            z-index: 18;
+            background: rgba(10, 8, 20, 0.45);
+        }
+
+        #kiss-scene.show {
+            display: block;
+        }
+
+        #kiss-heart {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 260px;
+            height: 220px;
+            transform: translate(-50%, -50%) scale(0.2);
+            background: linear-gradient(180deg, #ff75b5, #ff2f7d);
+            clip-path: polygon(50% 100%, 0 35%, 0 18%, 15% 0, 30% 0, 50% 22%, 70% 0, 85% 0, 100% 18%, 100% 35%);
+            box-shadow: 0 0 30px rgba(255, 94, 166, 0.9), 0 0 70px rgba(255, 94, 166, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: heartAppear 1.2s ease-out forwards;
+        }
+
+        @keyframes heartAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.2);
+            }
+            30% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        #kiss-heart span {
+            position: relative;
+            z-index: 1;
+            display: block;
+            width: 70%;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.7;
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+        }
+
+        .kiss-pose {
+            transition: left 0.8s ease, transform 0.8s ease, opacity 0.5s ease;
+        }
+
+        #woman-char.kissing {
+            left: 250px;
+            transform: rotate(-8deg) scale(1.02);
+        }
+
+        #man-char.kissing {
+            left: 420px;
+            transform: rotate(8deg) scale(1.02);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-frame">
+        <button id="sound-toggle" onclick="toggleAudio()">🔊 SONIDO: ON</button>
+
+        <div id="game-scene">
+            <div id="game-bg"></div>
+            <div class="scene-glow"></div>
+            <div id="stop-indicator">♥ PARADA ESPECIAL ♥</div>
+            <div id="character-layer">
+                <div id="woman-char" class="person woman walking"></div>
+                <div id="man-char" class="person man"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="story-panel">
+        <div id="dialog-box">
+            <div>
+                <div id="location-tag">📍 MARACAY - AV. LAS DELICIAS</div>
+                <div id="dialog-text">Presiona "INICIAR" para comenzar nuestro recorrido retro por Maracay...</div>
+            </div>
+            <button id="action-btn" onclick="nextStep()">INICIAR</button>
+        </div>
+    </div>
+
+    <div id="kiss-scene">
+        <div id="kiss-heart"><span>FELIZ CUMPLE MES<br>MI AMOR ❤️</span></div>
+    </div>
+
+    <div id="final-screen">
+            <h1>¡FELIZ CUMPLE MES VIVIENDO JUNTOS! ❤️</h1>
+            <p>Gracias por todo el cariño que me das, por ser tan especial por esa energia por ese afecto espero nunca cambies por que es lo que mas me gusta de ti...TE QUIERI MUCHO!</p>
+            <button class="restart-btn" onclick="restartGame()">REPETIR HISTORIA 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN DE LA HISTORIA CON AMBIENTACIÓN REAL DE MARACAY Y SUS PERSONAJES
+        const storySteps = [
+            {
+                location: "📍 MARACAY",
+                bg: "maracay_sindoni.png",
+                text: "Por las calles de nuestra hermosa ciudad jardin, caminaste por tantos años si saber que un dia tu vida cambiaria con un giro totalmente inesperado",
+                button: "CONTINUAR"
+            },
+            {
+                location: "📍 LA CIUDAD DONDE HAZ VIVDO",
+                bg: "maracay_sindoni.png",
+                text: "Recuerda que hoy estamos aqui por todo el camino que hemos dejado atras, todo lo que habias vivido te preparo para este momento.",
+                button: "CONTINUAR"
+            },
+            {
+                location: "📍 LA CIUDAD DONDE SOÑASTE",
+                bg: "maracay_plaza.png",
+                text: "es curioso como ocurren las cosas seguramente hace 5 meses no pensabas que hoy te ibas a encontrar en estas circunstancias de la vida",
+                button: "CONTINUAR"
+            },
+            {
+                location: "📍 LA CIUDAD DONDE ME CONOCISTE",
+                bg: "maracay_plaza.png",
+                text: "nos conocimos de la manera menos esperada y la verdad desde ese dia no me he querido separar de ti aun cuando aveces eres muy muy malcriada .",
+                button: "VER QUIÉN VIENE 👤"
+            },
+            {
+                location: "📍 LA CIUDAD QUE NOS UNIO",
+                bg: "maracay_obelisco.png",
+                text: "Gracias por ser como eres conmigo, disculpa por ser como soy y no ser lo que esperas. pero mis virtudes son otras y so todas tuyas",
+                button: "SEGUIR JUNTOS 🤝"
+            },
+            {
+                location: "📍 LA CIUDAD DONDE ESTAMOS FORMANDO UNA FAMILIA",
+                bg: "maracay_obelisco.png",
+                text: "Espero que la vida nos brinde la oportunidad de seguir viviendo tantas cosas y seguir creciendo como personas y algun dia seamos mas",
+                button: "CONTINUAR"
+            },
+            {
+                location: "📍 LOS LUGARES QUE NOS FALTAN POR CONOCER",
+                bg: "playa.png",
+                text: "Que la vida nos brinde la oportunida de seguir conociendo aquellos lugares que siempre soñamos por visitar y podamos construir la mas bonita de las historias.",
+                button: "CONTINUAR"
+            },
+            {
+                location: "📍 LA CIUDAD DONDE TENEMOS NUESTRO HOGAR",
+                bg: "maracay_obelisco.png",
+                text: "En poco tiempo hemos construido algo bonito que la vida nos siga dando mas oportunidaddes y momentos felices y algiun dia tengamos nuestro propio espacio",
+                button: "VER MENSAJE FINAL ❤️"
+            }
+        ];
+
+        let currentStep = -1;
+        let isAudioMuted = false;
+        let isTyping = false;
+        let typeTimeout = null;
+
+        const bgElement = document.getElementById('game-bg');
+        const dialogText = document.getElementById('dialog-text');
+        const locationTag = document.getElementById('location-tag');
+        const actionBtn = document.getElementById('action-btn');
+        const stopIndicator = document.getElementById('stop-indicator');
+        const finalScreen = document.getElementById('final-screen');
+        const womanChar = document.getElementById('woman-char');
+        const manChar = document.getElementById('man-char');
+
+        // Sintetizador de sonido 8-bits mediante Web Audio API (Cero archivos externos requeridos)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playRetroBeep(freq = 440, duration = 0.05, type = 'square') {
+            if (isAudioMuted) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                // Silencioso en navegadores sin soporte de audio
+            }
+        }
+
+        function playVictoryChime() {
+            if (isAudioMuted) return;
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, idx) => {
+                setTimeout(() => playRetroBeep(freq, 0.15, 'triangle'), idx * 120);
+            });
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            document.getElementById('sound-toggle').innerText = isAudioMuted ? "🔇 SONIDO: OFF" : "🔊 SONIDO: ON";
+        }
+
+        // Efecto Typewriter (Escribanía 8-bits letra por letra)
+        function typeWriter(text, i = 0) {
+            if (i === 0) {
+                dialogText.innerText = "";
+                isTyping = true;
+            }
+
+            if (i < text.length) {
+                dialogText.innerText += text.charAt(i);
+                if (i % 2 === 0) playRetroBeep(300 + (i % 4) * 40, 0.03);
+                typeTimeout = setTimeout(() => typeWriter(text, i + 1), 25);
+            } else {
+                isTyping = false;
+                actionBtn.disabled = false;
+            }
+        }
+
+        function updateCharactersForStep(stepIndex) {
+            const isEncounter = stepIndex === 4;
+            const isTogether = stepIndex >= 5;
+
+            womanChar.classList.remove('walking');
+            manChar.classList.remove('walking', 'visible');
+            womanChar.style.left = '14%';
+            manChar.style.left = '68%';
+
+            if (stepIndex <= 3) {
+                womanChar.style.opacity = '1';
+                manChar.style.opacity = '0';
+                womanChar.style.left = `${14 + stepIndex * 10}%`;
+                womanChar.classList.add('walking');
+            }
+
+            if (isEncounter) {
+                womanChar.style.left = '28%';
+                manChar.style.left = '52%';
+                manChar.classList.add('visible');
+                manChar.classList.add('walking');
+                womanChar.classList.add('walking');
+                womanChar.style.opacity = '1';
+                manChar.style.opacity = '1';
+            }
+
+            if (isTogether) {
+                womanChar.style.left = '26%';
+                manChar.style.left = '46%';
+                manChar.classList.add('visible');
+                womanChar.classList.add('walking');
+                womanChar.style.opacity = '1';
+                manChar.style.opacity = '1';
+            }
+        }
+
+        function showLoveFinal() {
+            finalScreen.style.display = "none";
+            stopIndicator.style.display = "none";
+            actionBtn.disabled = true;
+
+            const kissScene = document.getElementById('kiss-scene');
+            kissScene.classList.add('show');
+
+            womanChar.classList.add('walking', 'kissing');
+            manChar.classList.add('visible', 'walking', 'kissing');
+            womanChar.style.opacity = '1';
+            manChar.style.opacity = '1';
+            womanChar.style.left = '35%';
+            manChar.style.left = '52%';
+
+            playVictoryChime();
+
+            setTimeout(() => {
+                kissScene.classList.remove('show');
+                finalScreen.style.display = "flex";
+                actionBtn.disabled = false;
+            }, 2600);
+        }
+
+        function nextStep() {
+            if (isTyping) {
+                clearTimeout(typeTimeout);
+                dialogText.innerText = storySteps[currentStep].text;
+                isTyping = false;
+                actionBtn.disabled = false;
+                return;
+            }
+
+            currentStep++;
+
+            if (currentStep >= storySteps.length) {
+                showLoveFinal();
+                return;
+            }
+
+            const step = storySteps[currentStep];
+
+            bgElement.classList.add('bg-moving');
+            stopIndicator.style.display = 'none';
+            actionBtn.disabled = true;
+
+            // Cambiar fondo según la etapa del recorrido
+            if (step.bg) {
+                bgElement.style.backgroundImage = `linear-gradient(180deg, rgba(10,12,28,0.75), rgba(5,8,15,0.9)), url('${step.bg}')`;
+            }
+
+            playRetroBeep(220, 0.1);
+
+            setTimeout(() => {
+                bgElement.classList.remove('bg-moving');
+                updateCharactersForStep(currentStep);
+
+                if (currentStep === 4) {
+                    playVictoryChime();
+                }
+
+                locationTag.innerText = step.location;
+                actionBtn.innerText = step.button;
+                stopIndicator.style.display = 'block';
+                typeWriter(step.text);
+            }, 1100);
+        }
+
+        function restartGame() {
+            currentStep = -1;
+            finalScreen.style.display = "none";
+            document.getElementById('kiss-scene').classList.remove('show');
+            womanChar.classList.remove('kissing');
+            manChar.classList.remove('kissing');
+            womanChar.classList.add('walking');
+            womanChar.style.left = '14%';
+            womanChar.style.opacity = '1';
+            manChar.classList.remove('walking', 'visible');
+            manChar.style.opacity = '0';
+            manChar.style.left = '68%';
+            bgElement.style.backgroundImage = "linear-gradient(180deg, rgba(10,12,28,0.75), rgba(5,8,15,0.9)), url('maracay_sindoni.png')";
+            locationTag.innerText = "📍 MARACAY - AV. LAS DELICIAS";
+            dialogText.innerText = "Presiona 'INICIAR' para comenzar nuestro recorrido retro por Maracay...";
+            actionBtn.innerText = "INICIAR";
+            actionBtn.disabled = false;
+            stopIndicator.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
