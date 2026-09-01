@@ -720,7 +720,9 @@
 
         function startMusic() {
             if (!bgMusic) return;
+            bgMusic.muted = false;
             bgMusic.volume = isAudioMuted ? 0 : 0.45;
+            bgMusic.load();
             bgMusic.play().catch(() => {
                 // Algunos navegadores bloquean autoplay hasta el primer gesto del usuario.
             });
@@ -763,6 +765,10 @@
             document.getElementById('sound-toggle').innerText = isAudioMuted ? "🔇 SONIDO: OFF" : "🔊 SONIDO: ON";
             if (bgMusic) {
                 bgMusic.volume = isAudioMuted ? 0 : 0.45;
+                if (!isAudioMuted) {
+                    bgMusic.muted = false;
+                    bgMusic.play().catch(() => {});
+                }
             }
         }
 
@@ -771,6 +777,7 @@
         });
 
         document.addEventListener('pointerdown', startMusic, { once: true });
+        document.addEventListener('click', startMusic, { once: true });
 
         // Efecto Typewriter (Escribanía 8-bits letra por letra)
         function typeWriter(text, i = 0) {
