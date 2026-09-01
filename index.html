@@ -140,6 +140,7 @@
 
             #game-frame {
                 border-width: 4px;
+                border-radius: 12px;
             }
 
             #game-scene {
@@ -160,27 +161,38 @@
                 right: 10px;
                 padding: 7px 8px;
                 font-size: 7px;
+                letter-spacing: 0.5px;
+            }
+
+            #story-panel {
+                margin-top: 10px;
             }
 
             #dialog-box {
                 padding: 14px 12px;
                 min-height: 120px;
+                border-radius: 10px;
             }
 
             #location-tag {
                 font-size: 7px;
+                line-height: 1.5;
+                margin-bottom: 8px;
             }
 
             #dialog-text {
-                font-size: 9px;
-                line-height: 1.6;
+                font-size: 8.5px;
+                line-height: 1.7;
+                min-height: 60px;
             }
 
             #action-btn {
                 width: 100%;
                 align-self: stretch;
                 font-size: 8px;
-                padding: 10px 12px;
+                padding: 12px 10px;
+                margin-top: 12px;
+                line-height: 1.5;
             }
 
             #final-screen {
@@ -189,11 +201,13 @@
 
             #final-screen h1 {
                 font-size: 18px;
+                margin-bottom: 18px;
             }
 
             #final-screen p {
                 font-size: 9px;
                 line-height: 1.7;
+                margin-bottom: 18px;
             }
 
             #sound-toggle {
@@ -557,6 +571,8 @@
 </head>
 <body>
 
+    <audio id="bg-music" src="musica.mp3" loop preload="auto" autoplay playsinline></audio>
+
     <div id="game-frame">
         <button id="sound-toggle" onclick="toggleAudio()">🔊 SONIDO: ON</button>
 
@@ -650,6 +666,7 @@
         let isTyping = false;
         let typeTimeout = null;
 
+        const bgMusic = document.getElementById('bg-music');
         const bgElement = document.getElementById('game-bg');
         const dialogText = document.getElementById('dialog-text');
         const locationTag = document.getElementById('location-tag');
@@ -658,6 +675,14 @@
         const finalScreen = document.getElementById('final-screen');
         const womanChar = document.getElementById('woman-char');
         const manChar = document.getElementById('man-char');
+
+        function startMusic() {
+            if (!bgMusic) return;
+            bgMusic.volume = isAudioMuted ? 0 : 0.45;
+            bgMusic.play().catch(() => {
+                // Algunos navegadores bloquean autoplay hasta el primer gesto del usuario.
+            });
+        }
 
         // Sintetizador de sonido 8-bits mediante Web Audio API (Cero archivos externos requeridos)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -694,7 +719,16 @@
         function toggleAudio() {
             isAudioMuted = !isAudioMuted;
             document.getElementById('sound-toggle').innerText = isAudioMuted ? "🔇 SONIDO: OFF" : "🔊 SONIDO: ON";
+            if (bgMusic) {
+                bgMusic.volume = isAudioMuted ? 0 : 0.45;
+            }
         }
+
+        window.addEventListener('load', () => {
+            setTimeout(startMusic, 400);
+        });
+
+        document.addEventListener('pointerdown', startMusic, { once: true });
 
         // Efecto Typewriter (Escribanía 8-bits letra por letra)
         function typeWriter(text, i = 0) {
